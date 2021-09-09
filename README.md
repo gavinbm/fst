@@ -7,7 +7,7 @@ stores integers via pushes and pops. The hope is to add a decent number of built
 
  - [x] Make the stack store numbers
  - [x] Write an input loop
- - [ ] Write the lexer
+ - [x] Write the lexer
  - [ ] Build the initial dictionary
  - [ ] Allow for expansion of the dictionary
 
