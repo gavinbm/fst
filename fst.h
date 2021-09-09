@@ -31,6 +31,9 @@ struct Token {
 /* ---- lexer.c ---- */
 struct Token *lex(char *input);
 void create_token(struct Token **head, char *source, int type);
+int iskeyword(char *name);
+void print_tokens(struct Token *tokens);
+void free_tokens(struct Token *tokens);
 
 /* ---- stack.c ---- */
 struct Stack *init_stack();

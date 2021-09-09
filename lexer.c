@@ -7,7 +7,7 @@ struct Token *lex(char *input) {
 
     struct Token *tokens = NULL;
     char *substr;
-    int curr_pos;
+    int curr_pos, key;
 
     for(int i = 0; i < strlen(input); ++i) {
 
@@ -18,36 +18,36 @@ struct Token *lex(char *input) {
                 substr = malloc(2 * sizeof(char));
                 substr[0] = '+';
                 substr[1] = '\0';
-                createToken(&tokens, substr, 0);
+                create_token(&tokens, substr, 0);
                 free(substr);
                 break;
             case '-':
                 substr = malloc(2 * sizeof(char));
                 substr[0] = '-';
                 substr[1] = '\0';
-                createToken(&tokens, substr, 0);
+                create_token(&tokens, substr, 0);
                 free(substr);
                 break;
             case '*':
                 substr = malloc(2 * sizeof(char));
                 substr[0] = '*';
                 substr[1] = '\0';
-                createToken(&tokens, substr, 0);
+                create_token(&tokens, substr, 0);
                 free(substr);
                 break;
             case '/':
                 substr = malloc(2 * sizeof(char));
                 substr[0] = '/';
                 substr[1] = '\0';
-                createToken(&tokens, substr, 0);
+                create_token(&tokens, substr, 0);
                 free(substr);
                 break;
             case '\"':
                 i++; // get our current position passed the first qutoation
                 curr_pos = i; // save the position of the first character of the string
-                while(buffer[i] != '\"') {
+                while(input[i] != '\"') {
                     // iterate over the string checking for illegal characters
-                    if(buffer[i] == '\n' || buffer[i] == '\t' || buffer[i] == '\r' || buffer[i] == '\\' || buffer[i] == '%') {
+                    if(input[i] == '\n' || input[i] == '\t' || input[i] == '\r' || input[i] == '\\' || input[i] == '%') {
                         printf("illegal char in string...\n");
                         exit(1);
                     }
@@ -55,7 +55,7 @@ struct Token *lex(char *input) {
                 }
                 // allocate memory for and copy the contents of the string 
                 substr = malloc((i - curr_pos + 1) * sizeof(char));
-                memcpy(substr, &buffer[curr_pos], i - curr_pos + 1);
+                memcpy(substr, &input[curr_pos], i - curr_pos + 1);
                 substr[i - curr_pos] = '\0'; // set the null-terminator
                 create_token(&tokens, substr, 2);
                 free(substr);
@@ -72,24 +72,27 @@ struct Token *lex(char *input) {
                     substr[i - curr_pos] = '\0';
 
                     create_token(&tokens, substr, 0);
+                    
                     free(substr);
                 }
                 // if we're dealing with an integer literal
                 else if(isdigit(input[i])) {
+                    // save the current position
                     curr_pos = i;
                     while(isdigit(input[i]))
                         i++;
-                    
+
                     if(input[i] == '.') {
-                        printf("Number Error: no decimals allowed, only integers...\n");
+                        printf("no floats allowed...\n");
+                        exit(1);
                     }
 
                     substr = malloc((i - curr_pos + 1) * sizeof(char));
                     memcpy(substr, &input[curr_pos], i - curr_pos + 1);
-                    substr[i - curr_pos] = '\0';
-
-                    create_token(&tokens, substr, 1);
+                    substr[i - curr_pos] = '\0'; // set the null-terminator
+                    create_token(&tokens, substr, 2);
                     free(substr);
+                    i--;
                 }
                 // an unrecognized token
                 else {
@@ -98,6 +101,8 @@ struct Token *lex(char *input) {
                 break;
         }
     }
+
+    return tokens;
 }
 
 /*
@@ -119,4 +124,39 @@ void create_token(struct Token **head, char *source, int type) {
     
     add->next = *tmp;
     *tmp = add;
+}
+
+int iskeyword(char *name) {
+    char keywords[10][9] = {
+        "PLUS", "MINUS", "MUL",
+        "DIV", "PRINT", "",
+    }
+}
+
+/*
+Prints all the tokens in the given list
+*/
+void print_tokens(struct Token *tokens) {
+    struct Token *tmp = tokens;
+
+    while(tmp != NULL) {
+        printf("%s\n", tmp->src);
+        printf("[%s] -- [%d]\n", tmp->src, tmp->type);
+        tmp = tmp->next;
+    }
+}
+
+/*
+Frees all the tokens in the given list
+*/
+
+void free_tokens(struct Token *tokens) {
+    struct Token *tmp = tokens, *tmp2;
+
+    while(tmp != NULL) {
+        tmp2 = tmp;
+        tmp = tmp->next;
+        free(tmp2->src);
+        free(tmp2);
+    }
 }

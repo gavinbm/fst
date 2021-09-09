@@ -4,29 +4,31 @@ int main() {
     char buffer[MAXLEN];
 
     struct Stack *stack = init_stack();
-    
+    struct Token *tokens = NULL, *curr_tok;
+
     while(1) {
         printf(">> ");
         if(fgets(buffer, MAXLEN, stdin) != NULL) {
-        buffer[strlen(buffer) - 1] = '\0';
+            buffer[strlen(buffer) - 1] = '\0';
 
-        
-            if(strcmp(buffer, "exit") == 0) {
-                printf("exiting input loop...\n");
-                break;
+            // lex the buffer into tokens that we can analyze
+            tokens = lex(buffer);
+            print_tokens(tokens);
+            for(curr_tok = tokens; curr_tok != NULL; curr_tok = curr_tok->next) {
+
+                switch(curr_tok->type) {
+                    case 0: // it's a word
+                        break;
+                    case 1: // it's a literal number or char
+                        break;
+                    case 2: // it's a literal string
+                        break;
+                    default: // it's something else
+                        break;
+                }
             }
-            else if(strcmp(buffer, "print") == 0) {
-                print_stack(stack);
-            }
-            else if(strcmp(buffer, "pop") == 0) {
-                pop(stack);
-            } else {
-                int val;
-                if((val = atoi(buffer)))
-                    push(stack, val);
-                else
-                    printf("Invalid literal...\n");
-            }
+
+            free_tokens(tokens);
         }
     }
 
