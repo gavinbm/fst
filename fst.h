@@ -30,7 +30,7 @@ struct Token {
 /* ---- dict.c ---- */
 /* ---- lexer.c ---- */
 struct Token *lex(char *input);
-int indict(char *name);
+void create_token(struct Token **head, char *source, int type);
 
 /* ---- stack.c ---- */
 struct Stack *init_stack();
