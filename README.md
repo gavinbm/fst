@@ -28,6 +28,7 @@ The built-in instructions include:
     - -     ( n m -- (n - m) )
     - *     ( n m -- (n * m) )
     - /     ( n m -- (n / m) )
+    - %     ( n m -- (n % m) )
  - Boolean operators for comparisons
     - =     checks equality of top two items on the stack
     - !     checks for inequality
@@ -45,7 +46,7 @@ The built-in instructions include:
  - Simple I/O instructions
     - dgt   ( n -- )
     - ltr   ( c -- )
-    - stk   ( c -- c )
+    - stk   ( -- )
     - rtn   ( -- )
     - st"   ( -- )
 ```
