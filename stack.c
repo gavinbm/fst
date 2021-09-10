@@ -1,4 +1,4 @@
-#include "fst.h"
+#include "tinyforth.h"
 
 /*
     Initialize the stack that we'll push things to.

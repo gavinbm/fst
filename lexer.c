@@ -1,4 +1,4 @@
-#include "fst.h"
+#include "tinyforth.h"
 
 struct Token *lex(char *input) {
     // iterate over the input stream and tokenize it.
@@ -124,13 +124,6 @@ void create_token(struct Token **head, char *source, int type) {
     
     add->next = *tmp;
     *tmp = add;
-}
-
-int iskeyword(char *name) {
-    char keywords[10][9] = {
-        "PLUS", "MINUS", "MUL",
-        "DIV", "PRINT", "",
-    }
 }
 
 /*

@@ -1,4 +1,4 @@
-#include "fst.h"
+#include "tinyforth.h"
 
 int main() {
     char buffer[MAXLEN];
