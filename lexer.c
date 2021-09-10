@@ -42,6 +42,13 @@ struct Token *lex(char *input) {
                 create_token(&tokens, substr, 0);
                 free(substr);
                 break;
+            case '%':
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '%';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 0);
+                free(substr);
+                break;
             case '\"':
                 i++; // get our current position passed the first qutoation
                 curr_pos = i; // save the position of the first character of the string

@@ -48,7 +48,9 @@ The built-in instructions include:
     - ltr   ( c -- )
     - stk   ( -- )
     - rtn   ( -- )
-    - st"   ( -- )
+    - "     ( -- )
+ - New instruction creation
+    - :   creates a new instruction using the ones you have
 ```
 
 # What is a FORTH and what is TinyFORTH?
