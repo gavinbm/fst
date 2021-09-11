@@ -6,8 +6,8 @@ This is the very early stages of development and right now only really allows yo
 
  - [x] Make the stack store numbers
  - [x] Write an input loop
- - [ ] Write the lexer
- - [ ] Build the initial dictionary
+ - [x] Write the lexer
+ - [x] Build the initial dictionary
  - [ ] Allow for expansion of the dictionary
 
 # Current Features and Instructions
@@ -23,13 +23,13 @@ The actual operations that happen here are itty bitty pop will read the 2, recog
 
 The built-in instructions include:
 ```
- - Arithmetic operators for integers
+ - Arithmetic operators for integers  (DONE)
     - +     ( n m -- (n + m) )
     - -     ( n m -- (n - m) )
     - *     ( n m -- (n * m) )
     - /     ( n m -- (n / m) )
     - %     ( n m -- (n % m) )
- - Boolean operators for comparisons
+ - Boolean operators for comparisons   (DONE)
     - =     checks equality of top two items on the stack
     - !     checks for inequality
     - >     checks for greater than
@@ -37,18 +37,18 @@ The built-in instructions include:
     - and   bitwise AND
     - orr   bitwise OR
     - inv   bitwise NOT
- - Stack manipulation instructions
+ - Stack manipulation instructions     (DONE)
     - dup   ( n -- n n )
     - pop   ( n -- )
     - swp   ( n m -- m n ) 
     - ovr   ( n m -- n m n )
     - rot   ( n m o -- o m n )
- - Simple I/O instructions
+ - Simple I/O instructions             (DONE)
     - dgt   ( n -- )
     - ltr   ( c -- )
     - stk   ( -- )
     - rtn   ( -- )
- - New instruction creation
+ - New instruction creation             (WiP)
     - :   creates a new instruction using the ones you have
 ```
 
