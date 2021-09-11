@@ -133,19 +133,92 @@ int main() {
                         break;
                     /* --- Boolean operations --- */
                     case 16: // =
+                        if(stack->len >= 2) {
+                            if(stack->head->value == stack->head->next->value) {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 1);
+                            } else {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 0);
+                            }
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     case 17: // !
+                        if(stack->len >= 2) {
+                            if(stack->head->value != stack->head->next->value) {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 1);
+                            } else {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 0);
+                            }
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     case 18: // >
+                        if(stack->len >= 2) {
+                            if(stack->head->value > stack->head->next->value) {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 1);
+                            } else {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 0);
+                            }
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     case 19: // <
+                        if(stack->len >= 2) {
+                            if(stack->head->value < stack->head->next->value) {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 1);
+                            } else {
+                                pop(stack);
+                                pop(stack);
+                                push(stack, 0);
+                            }
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     /* --- Bitwise operations --- */
                     case 20: // AND
+                        if(stack->len >= 2) {
+                            tmp1 = stack->head->value & stack->head->next->value;
+                            pop(stack);
+                            push(stack, tmp1);
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     case 21: // ORR
+                        if(stack->len >= 2) {
+                            tmp1 = stack->head->value | stack->head->next->value;
+                            pop(stack);
+                            push(stack, tmp1);
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     case 22: // INV
+                        if(stack->len >= 2) {
+                            tmp1 = ~stack->head->value;
+                            pop(stack);
+                            push(stack, tmp1);
+                        } else {
+                            push(stack, 1);
+                        }
                         break;
                     /* --- I/O operations --- */
                     case 23: // DGT
