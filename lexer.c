@@ -25,40 +25,42 @@ struct Token *lex(char *input) {
     char *substr;
     int curr_pos, key;
 
-    for(int i = 0; i < strlen(input); ++i) {
-
+    for(int i = 0; i < strlen(input); i++) {
+    
         switch(input[i]) {
             case ' ':
                 break;
+            case '\n':
+                break;
             case '+':
-                makeshorttoken(input[i], 11, tokens);
+                makeshorttoken('+', 11, tokens);
                 break;
             case '-':
-                makeshorttoken(input[i], 12, tokens);
+                makeshorttoken('-', 12, tokens);
                 break;
             case '*':
-                makeshorttoken(input[i], 13, tokens);
+                makeshorttoken('*', 13, tokens);
                 break;
             case '/':
-                makeshorttoken(input[i], 14, tokens);
+                makeshorttoken('/', 14, tokens);
                 break;
             case '%':
-                makeshorttoken(input[i], 15, tokens);
+                makeshorttoken('%', 15, tokens);
                 break;
             case '=':
-                makeshorttoken(input[i], 16, tokens);
+                makeshorttoken('=', 16, tokens);
                 break;
             case '!':
-                makeshorttoken(input[i], 17, tokens);
+                makeshorttoken('!', 17, tokens);
                 break;
             case '>':
-                makeshorttoken(input[i], 18, tokens);
+                makeshorttoken('>', 18, tokens);
                 break;
             case '<':
-                makeshorttoken(input[i], 19, tokens);
+                makeshorttoken('<', 19, tokens);
                 break;
             case ':':
-                makeshorttoken(input[i], 27, tokens);
+                makeshorttoken(':', 27, tokens);
                 break;
             case '\"':
                 i++; // get our current position passed the first qutoation
@@ -183,6 +185,18 @@ void strupper(char *str) {
         str[i] = toupper(str[i]);
 }
 
+char *append_line(char *curr_code, char *new_code) {
+    int curr_len = strlen(curr_code), added_len = strlen(new_code);
+
+    char *full_code = malloc((curr_len + added_len + 1) * sizeof(char));
+    memcpy(full_code, curr_code, curr_len);
+    memcpy(full_code + curr_len, new_code, added_len);
+    full_code[(curr_len + added_len)] = '\0';
+    
+    free(curr_code);
+    return full_code;
+}
+
 /*
 Prints all the tokens in the given list
 */
@@ -190,7 +204,6 @@ void print_tokens(struct Token *tokens) {
     struct Token *tmp = tokens;
 
     while(tmp != NULL) {
-        printf("%s\n", tmp->src);
         printf("[%s] -- [%d]\n", tmp->src, tmp->type);
         tmp = tmp->next;
     }

@@ -10,6 +10,8 @@ int main() {
 
     struct Stack *stack = init_stack(STACKCAP);
     struct Token *tokens = NULL, *curr_tok;
+    struct DictEntry *dict = NULL;
+    char *substr;
     int tmp1, tmp2, tmp3, tmp4;
     int vars[12] = {
         0, 0, 0, 0,
@@ -23,7 +25,7 @@ int main() {
         // Get a line of input, make sure it isn't null, tokenize and process it
         if(fgets(buffer, MAXLEN, stdin) != NULL) {
             buffer[strlen(buffer) - 1] = '\0';  // set the null terminator
-
+           
             tokens = lex(buffer); // lex the buffer into tokens that we can analyze
             //print_tokens(tokens); // print the tokens
 
@@ -235,6 +237,18 @@ int main() {
                         break;
                     /* --- New op creator --- */
                     case 27: // :
+                        printf("here\n");
+                        curr_tok = curr_tok->next;
+
+                        substr = malloc(strlen((curr_tok->src) + 1) * sizeof(char));
+                        strcpy(substr, curr_tok->src);
+                        while(curr_tok != NULL) {
+                            curr_tok = curr_tok->next;
+                            substr = append_line(substr, curr_tok->src);
+                            substr = append_line(substr, " ");
+                        }
+                        printf("[%s]\n", substr);
+                        free(substr);
                         break;
                     /* --- Exit the program --- */
                     case 28: // BYE
