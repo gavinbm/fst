@@ -95,7 +95,7 @@ struct Token *lex(char *input) {
                     if(key)
                         create_token(&tokens, substr, key);
                     else
-                        create_token(&tokens, substr, 28);
+                        create_token(&tokens, substr, 30);
 
                     free(substr);
                 }

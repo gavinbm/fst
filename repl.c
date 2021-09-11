@@ -171,7 +171,7 @@ int main() {
                         return 0;
                         break;
                     default:
-                        printf("invalid...\n");
+                        printf("wtf is %s?\n", curr_tok->src);
                         break;
                 }
             }
