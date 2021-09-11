@@ -73,6 +73,7 @@ struct Token *lex(char *input) {
                     memcpy(substr, &input[curr_pos], i - curr_pos + 1);
                     substr[i - curr_pos] = '\0';
 
+                    strupper(substr); // make sure the letters are uppercase
                     key = iskeyword(substr);
                     if(key)
                         create_token(&tokens, substr, key);
@@ -133,16 +134,16 @@ void create_token(struct Token **head, char *source, int type) {
 }
 
 int iskeyword(char *name) {
-    char keys[27][7] = {
+    char keys[28][7] = {
         "EOF", "NEWLINE", "NUMBER",
         "VAR", "STRING", "DUP",
         "POP", "SWP", "OVR", "ROT",
         "+", "-", "*", "/", "%%",
         "=", "!", ">", "<", "AND",
         "ORR", "INV", "DGT", "LTR",
-        "STK", "\"", ":"};
+        "STK", "RTN", ":", "BYE"};
     
-    for(int i = 0; i < 27; i++) {
+    for(int i = 0; i < 28; i++) {
         if(strcmp(name, keys[i]) == 0)
             return i + 1;
     }
@@ -156,6 +157,13 @@ void makeshorttoken(char letter, int type, struct Token *tokens) {
     substr[1] = '\0';
     create_token(&tokens, substr, type);
     free(substr);
+}
+
+void strupper(char *str) {
+    int len = strlen(str);
+
+    for(int i = 0; i < len; i++)
+        str[i] = toupper(str[i]);
 }
 
 /*

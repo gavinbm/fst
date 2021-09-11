@@ -15,10 +15,10 @@
   STRING  = 5     ROT = 10    % = 15
 
   Bitwise Ops     I/O Ops     New Op Creator
-   AND = 20       DGT = 23      :  = 27
-   ORR = 21       LTR = 24
+   AND = 20       DGT = 23      :   = 27
+   ORR = 21       LTR = 24      BYE = 28
    INV = 22       STK = 25
-                  "   = 26
+                  RTN = 26
 */
 
 struct StackNode {
@@ -45,6 +45,7 @@ struct Token *lex(char *input);
 void create_token(struct Token **head, char *source, int type);
 int iskeyword(char *name);
 void makeshorttoken(char letter, int type, struct Token *tokens);
+void strupper(char *str);
 void print_tokens(struct Token *tokens);
 void free_tokens(struct Token *tokens);
 
