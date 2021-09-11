@@ -1,4 +1,4 @@
-#include "tinyforth.h"
+#include "ibp.h"
 
 int main() {
     char buffer[MAXLEN];
@@ -11,24 +11,13 @@ int main() {
         if(fgets(buffer, MAXLEN, stdin) != NULL) {
             buffer[strlen(buffer) - 1] = '\0';
 
-            // lex the buffer into tokens that we can analyze
-            tokens = lex(buffer);
-            print_tokens(tokens);
-            for(curr_tok = tokens; curr_tok != NULL; curr_tok = curr_tok->next) {
+            tokens = lex(buffer); // lex the buffer into tokens that we can analyze
+            print_tokens(tokens); // print the tokens
 
-                switch(curr_tok->type) {
-                    case 0: // it's a word
-                        break;
-                    case 1: // it's a literal number or char
-                        break;
-                    case 2: // it's a literal string
-                        break;
-                    default: // it's something else
-                        break;
-                }
-            }
-
-            free_tokens(tokens);
+            free_tokens(tokens); // free the tokens so we can tokenize the next line of input
+        } else {
+            printf("Error getting input...\n");
+            break;
         }
     }
 

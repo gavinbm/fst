@@ -1,4 +1,4 @@
-#include "tinyforth.h"
+#include "ibp.h"
 
 struct Token *lex(char *input) {
     // iterate over the input stream and tokenize it.
@@ -15,39 +15,34 @@ struct Token *lex(char *input) {
             case ' ':
                 break;
             case '+':
-                substr = malloc(2 * sizeof(char));
-                substr[0] = '+';
-                substr[1] = '\0';
-                create_token(&tokens, substr, 0);
-                free(substr);
+                makeshorttoken(input[i], 11, tokens);
                 break;
             case '-':
-                substr = malloc(2 * sizeof(char));
-                substr[0] = '-';
-                substr[1] = '\0';
-                create_token(&tokens, substr, 0);
-                free(substr);
+                makeshorttoken(input[i], 12, tokens);
                 break;
             case '*':
-                substr = malloc(2 * sizeof(char));
-                substr[0] = '*';
-                substr[1] = '\0';
-                create_token(&tokens, substr, 0);
-                free(substr);
+                makeshorttoken(input[i], 13, tokens);
                 break;
             case '/':
-                substr = malloc(2 * sizeof(char));
-                substr[0] = '/';
-                substr[1] = '\0';
-                create_token(&tokens, substr, 0);
-                free(substr);
+                makeshorttoken(input[i], 14, tokens);
                 break;
             case '%':
-                substr = malloc(2 * sizeof(char));
-                substr[0] = '%';
-                substr[1] = '\0';
-                create_token(&tokens, substr, 0);
-                free(substr);
+                makeshorttoken(input[i], 15, tokens);
+                break;
+            case '=':
+                makeshorttoken(input[i], 16, tokens);
+                break;
+            case '!':
+                makeshorttoken(input[i], 17, tokens);
+                break;
+            case '>':
+                makeshorttoken(input[i], 18, tokens);
+                break;
+            case '<':
+                makeshorttoken(input[i], 19, tokens);
+                break;
+            case ':':
+                makeshorttoken(input[i], 27, tokens);
                 break;
             case '\"':
                 i++; // get our current position passed the first qutoation
@@ -78,8 +73,12 @@ struct Token *lex(char *input) {
                     memcpy(substr, &input[curr_pos], i - curr_pos + 1);
                     substr[i - curr_pos] = '\0';
 
-                    create_token(&tokens, substr, 0);
-                    
+                    key = iskeyword(substr);
+                    if(key)
+                        create_token(&tokens, substr, key);
+                    else
+                        create_token(&tokens, substr, 28);
+
                     free(substr);
                 }
                 // if we're dealing with an integer literal
@@ -97,7 +96,7 @@ struct Token *lex(char *input) {
                     substr = malloc((i - curr_pos + 1) * sizeof(char));
                     memcpy(substr, &input[curr_pos], i - curr_pos + 1);
                     substr[i - curr_pos] = '\0'; // set the null-terminator
-                    create_token(&tokens, substr, 2);
+                    create_token(&tokens, substr, 3);
                     free(substr);
                     i--;
                 }
@@ -131,6 +130,32 @@ void create_token(struct Token **head, char *source, int type) {
     
     add->next = *tmp;
     *tmp = add;
+}
+
+int iskeyword(char *name) {
+    char keys[27][7] = {
+        "EOF", "NEWLINE", "NUMBER",
+        "VAR", "STRING", "DUP",
+        "POP", "SWP", "OVR", "ROT",
+        "+", "-", "*", "/", "%%",
+        "=", "!", ">", "<", "AND",
+        "ORR", "INV", "DGT", "LTR",
+        "STK", "\"", ":"};
+    
+    for(int i = 0; i < 27; i++) {
+        if(strcmp(name, keys[i]) == 0)
+            return i + 1;
+    }
+
+    return 0;
+}
+
+void makeshorttoken(char letter, int type, struct Token *tokens) {
+    char *substr = malloc(2 * sizeof(char));
+    substr[0] = letter;
+    substr[1] = '\0';
+    create_token(&tokens, substr, type);
+    free(substr);
 }
 
 /*
