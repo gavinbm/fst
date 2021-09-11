@@ -50,7 +50,7 @@ void print_tokens(struct Token *tokens);
 void free_tokens(struct Token *tokens);
 
 /* ---- stack.c ---- */
-struct Stack *init_stack();
+struct Stack *init_stack(int capacity);
 void push(struct Stack *stack, int new_value);
 void pop(struct Stack *stack);
 void print_stack(struct Stack *stack);

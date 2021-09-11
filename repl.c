@@ -8,9 +8,9 @@ Prints my name, Gavin with a newline at the end
 int main() {
     char buffer[MAXLEN];
 
-    struct Stack *stack = init_stack();
+    struct Stack *stack = init_stack(STACKCAP);
     struct Token *tokens = NULL, *curr_tok;
-    int value;
+    int tmp1, tmp2, tmp3, tmp4;
     int vars[12] = {
         0, 0, 0, 0,
         0, 0, 0, 0,
@@ -32,9 +32,9 @@ int main() {
                 // pass our token type into a switch so we can execute the right instructions
                 switch(curr_tok->type) {
                     case 3: // it's a number
-                        value = atoi(curr_tok->src);
-                        if(value) {
-                            push(stack, value);
+                        tmp1 = atoi(curr_tok->src);
+                        if(tmp1) {
+                            push(stack, tmp1);
                         } else {
                             printf("invalid number...\n");
                         }
@@ -46,26 +46,90 @@ int main() {
                         break;
                     /* --- Stack operations --- */
                     case 6: // the DUP stack operation
+                        if(stack->head != NULL) {
+                            push(stack, stack->head->value);
+                        } else {
+                            printf("dup: needs at least 1 node on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 7: // the POP stack operation
                         pop(stack);
                         break;
                     case 8: // the SWP stack operation
+                        if(stack->len >= 2) {
+                            tmp1 = stack->head->value;
+                            pop(stack);
+                            tmp2 = stack->head->value;
+                            pop(stack);
+                            push(stack, tmp1);
+                            push(stack, tmp2);
+                        } else {
+                            printf("swp: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 9: // the OVR stack operation
+                        if(stack->len >= 2) {
+                            tmp1 = stack->head->next->value;
+                            push(stack, tmp1);
+                        } else {
+                            printf("ovr: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 10: //the ROT stack operation
+                        if(stack->len >= 3) {
+                            tmp1 = stack->head->value;
+                            tmp2 = stack->head->next->value;
+                            tmp3 = stack->head->next->next->value;
+                            pop(stack);
+                            pop(stack);
+                            pop(stack);
+                            push(stack, tmp1);
+                            push(stack, tmp2);
+                            push(stack, tmp3);
+                        } else {
+                            printf("ovr: needs at least 3 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     /* --- Math operations --- */
                     case 11: // +
+                        if(stack->len >= 2) {
+                            stack->head->next->value = stack->head->next->value + stack->head->value;
+                            pop(stack);
+                        } else {
+                            printf("+: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 12: // -
+                        if(stack->len >= 2) {
+                            stack->head->next->value = stack->head->next->value - stack->head->value;
+                            pop(stack);
+                        } else {
+                            printf("-: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 13: // *
+                        if(stack->len >= 2) {
+                            stack->head->next->value = stack->head->next->value * stack->head->value;
+                            pop(stack);
+                        } else {
+                            printf("*: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 14: // / (division)
+                        if(stack->len >= 2) {
+                            stack->head->next->value = stack->head->next->value / stack->head->value;
+                            pop(stack);
+                        } else {
+                            printf("/: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     case 15: // % (modulo)
+                        if(stack->len >= 2) {
+                            stack->head->next->value = stack->head->next->value % stack->head->value;
+                            pop(stack);
+                        } else {
+                            printf("%%: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
+                        }
                         break;
                     /* --- Boolean operations --- */
                     case 16: // =

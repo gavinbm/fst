@@ -3,11 +3,11 @@
 /*
     Initialize the stack that we'll push things to.
 */
-struct Stack *init_stack() {
+struct Stack *init_stack(int capacity) {
     struct Stack *stack = malloc(sizeof(struct Stack));
     stack->head = NULL;
     stack->len = 0;
-    stack->capacity = 5;
+    stack->capacity = capacity;
 
     return stack;
 }

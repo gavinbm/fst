@@ -1,5 +1,21 @@
 #include "ibp.h"
 
+/*
+         ------ Token Type Map ------
+   Specials      Stack Ops   Math Ops   Bool Ops
+  EOF     = 1     DUP = 6     + = 11     =  = 16
+  NEWLINE = 2     POP = 7     - = 12     !  = 17
+  NUMBER  = 3     SWP = 8     * = 13     >  = 18
+  VAR     = 4     OVR = 9     / = 14     <  = 19
+  STRING  = 5     ROT = 10    % = 15
+
+  Bitwise Ops     I/O Ops     New Op Creator
+   AND = 20       DGT = 23      :   = 27
+   ORR = 21       LTR = 24      BYE = 28
+   INV = 22       STK = 25
+                  RTN = 26
+*/
+
 struct Token *lex(char *input) {
     // iterate over the input stream and tokenize it.
     // catch any invalid tokens and throw the appropriate error
@@ -59,14 +75,15 @@ struct Token *lex(char *input) {
                 substr = malloc((i - curr_pos + 1) * sizeof(char));
                 memcpy(substr, &input[curr_pos], i - curr_pos + 1);
                 substr[i - curr_pos] = '\0'; // set the null-terminator
-                create_token(&tokens, substr, 2);
+                create_token(&tokens, substr, 5);
                 free(substr);
                 break;
             default:
                 // If we're dealing with an instruction word
                 if(isalpha(input[i])) {
                     curr_pos = i;
-                    while(input[i] != ' ')
+
+                    while(isalnum(input[i]))
                         i++;
                     
                     substr = malloc((i - curr_pos + 1) * sizeof(char));
