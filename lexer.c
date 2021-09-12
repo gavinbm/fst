@@ -33,34 +33,74 @@ struct Token *lex(char *input) {
             case '\n':
                 break;
             case '+':
-                makeshorttoken('+', 11, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '+';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 11);
+                free(substr);
                 break;
             case '-':
-                makeshorttoken('-', 12, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '-';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 12);
+                free(substr);
                 break;
             case '*':
-                makeshorttoken('*', 13, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '*';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 13);
+                free(substr);
                 break;
             case '/':
-                makeshorttoken('/', 14, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '/';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 14);
+                free(substr);
                 break;
             case '%':
-                makeshorttoken('%', 15, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '%';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 15);
+                free(substr);
                 break;
             case '=':
-                makeshorttoken('=', 16, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '=';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 16);
+                free(substr);
                 break;
             case '!':
-                makeshorttoken('!', 17, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '!';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 17);
+                free(substr);
                 break;
             case '>':
-                makeshorttoken('>', 18, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '>';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 18);
+                free(substr);
                 break;
             case '<':
-                makeshorttoken('<', 19, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = '<';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 19);
+                free(substr);
                 break;
             case ':':
-                makeshorttoken(':', 27, tokens);
+                substr = malloc(2 * sizeof(char));
+                substr[0] = ':';
+                substr[1] = '\0';
+                create_token(&tokens, substr, 27);
+                free(substr);
                 break;
             case '\"':
                 i++; // get our current position passed the first qutoation

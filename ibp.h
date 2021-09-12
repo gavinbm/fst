@@ -45,8 +45,13 @@ struct DictEntry {
 };
 
 /* ---- repl.c ---- */
+void repl(struct Stack *stack, struct Token *tokens, struct DictEntry *dict);
+
 /* ---- dict.c ---- */
 void create_entry(struct DictEntry **head, char *name, char *instructions);
+void print_dict(struct DictEntry *dict);
+void free_dict(struct DictEntry *dict);
+struct DictEntry *indict(struct DictEntry *head, char *name);
 
 /* ---- lexer.c ---- */
 struct Token *lex(char *input);

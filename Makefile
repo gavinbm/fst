@@ -1,10 +1,13 @@
 all: build
 
-build: stack.o repl.o lexer.o
-	cc -o ibp stack.o repl.o lexer.o -ggdb
+build: stack.o repl.o lexer.o dict.o
+	cc -o ibp stack.o repl.o lexer.o dict.o -ggdb
 
 repl.o: repl.c ibp.h
 	cc -c repl.c ibp.h -ggdb
+
+dict.o: dict.c ibp.h
+	cc -c dict.c ibp.h -ggdb
 
 lexer.o: lexer.c ibp.h
 	cc -c lexer.c ibp.h -ggdb
