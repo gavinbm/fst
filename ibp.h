@@ -1,24 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #define MAXLEN 128
 #define STACKCAP 64
 
 /*
-        ------ Token Type Map ------
-   Specials      Stack Ops   Math Ops   Bool Ops
-  EOF     = 1     DUP = 6     + = 11     =  = 16
-  NEWLINE = 2     POP = 7     - = 12     !  = 17
-  NUMBER  = 3     SWP = 8     * = 13     >  = 18
-  VAR     = 4     OVR = 9     / = 14     <  = 19
-  STRING  = 5     ROT = 10    % = 15
-
-  Bitwise Ops     I/O Ops     New Op Creator
-   AND = 20       DGT = 23      :   = 27
-   ORR = 21       LTR = 24      BYE = 28
-   INV = 22       STK = 25
-                  RTN = 26
+=== instruction set ===
+ - Arithmetic operators for integers  (DONE)
+    - +     ( n m -- (n + m) )
+    - -     ( n m -- (n - m) )
+    - *     ( n m -- (n * m) )
+    - /     ( n m -- (n / m) )
+    - %     ( n m -- (n % m) )
+ - Boolean operators for comparisons   (DONE)
+    - =     checks equality of top two items on the stack
+    - !     checks for inequality
+    - >     checks for greater than
+    - <     checks for less than
+    - and   bitwise AND
+    - orr   bitwise OR
+    - inv   bitwise NOT
+ - Stack manipulation instructions     (DONE)
+    - dup   ( n -- n n )
+    - pop   ( n -- )
+    - swp   ( n m -- m n ) 
+    - ovr   ( n m -- n m n )
+    - rot   ( n m o -- o m n )
+ - Simple I/O instructions             (DONE)
+    - dgt   ( n -- )
+    - ltr   ( c -- )
+    - stk   ( -- )
+    - rtn   ( -- )
+ - New instruction creation             (WiP)
+    - def   creates a new instruction using the ones you have
 */
 
 struct StackNode {
@@ -30,12 +44,6 @@ struct Stack {
     int capacity;
     int len;
     struct StackNode *head;
-};
-
-struct Token {
-    char *src;
-    int type;
-    struct Token *next;
 };
 
 struct DictEntry {
@@ -54,14 +62,8 @@ void free_dict(struct DictEntry *dict);
 struct DictEntry *indict(struct DictEntry *head, char *name);
 
 /* ---- lexer.c ---- */
-struct Token *lex(char *input);
-void create_token(struct Token **head, char *source, int type);
-int iskeyword(char *name);
-void makeshorttoken(char letter, int type, struct Token *tokens);
 void strupper(char *str);
 char *append_line(char *curr_code, char *new_code);
-void print_tokens(struct Token *tokens);
-void free_tokens(struct Token *tokens);
 
 /* ---- stack.c ---- */
 struct Stack *init_stack(int capacity);
