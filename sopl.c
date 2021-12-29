@@ -24,6 +24,7 @@ char *readfile(char *filename, int *len) {
     *len = length;
     return buffer;
 } 
+
 // ============================================
 // === Lexer ===
 
@@ -371,7 +372,7 @@ int main() {
         if(fgets(buffer, MAXLEN, stdin) != NULL) {
             buffer[strlen(buffer) - 1] = '\0';  // set the null terminator
             
-            next(lexer);
+            next(&lexer);
             exec(stack, lexer);
 
         } else {
