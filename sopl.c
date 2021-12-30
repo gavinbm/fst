@@ -61,7 +61,7 @@ char *readfile(char *filename, int *len) {
 // ============================================
 // === the stack ===
 int stack[STACKCAP];
-int spr = 0;
+int spr = -1;
 
 void push(int value) {
     if(spr < STACKCAP) {
