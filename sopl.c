@@ -226,30 +226,89 @@ void exec(lex *lexer) {
             break;
         // === arithmetic ops ===
         case PLS:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 + tmp2);
             break;
         case MIN:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 - tmp2);
             break;
         case MUL:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 * tmp2);
             break;
         case DIV:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 / tmp2);
             break;
         case MOD:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 % tmp2);
             break;
         // === boolean ops ===
         case EQL:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            if(tmp1 == tmp2)
+                push(1);
+            else
+                push(0);
             break;
         case NOT:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            if(tmp1 != tmp2)
+                push(1);
+            else
+                push(0);
             break;
         case GRT:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            if(tmp1 > tmp2)
+                push(1);
+            else
+                push(0);
             break;
         case LES:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            if(tmp1 < tmp2)
+                push(1);
+            else
+                push(0);
             break;
         // === bitwise ops ===
         case AND:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 & tmp2);
             break;
         case ORR:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            pop(); pop();
+            push(tmp1 | tmp2);
             break;
         case INV:
+            tmp1 = stack[spr];
+            pop();
+            push(~tmp1);
             break;
         // === i/o ops ===
         case DGT:
