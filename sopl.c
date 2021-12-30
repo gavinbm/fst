@@ -38,26 +38,6 @@
 Prints my name with a newline at the end
 */
 
-// === Utility Functions ===
-char *readfile(char *filename, int *len) {
-    FILE *fp = fopen(filename, "r");
-    char *buffer = NULL;
-    long length;
-
-    if(fp) {
-        fseek(fp, 0, SEEK_END);
-        length = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-        buffer = malloc(length + 1);
-        if(buffer) {
-            fread(buffer, 1, length, fp);
-        }
-        fclose(fp);
-    }
-    *len = length;
-    return buffer;
-} 
-
 // ============================================
 // === the stack ===
 int stack[STACKCAP];
