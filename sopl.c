@@ -199,7 +199,64 @@ void exec(lex *lexer) {
     int tmp1, tmp2, tmp3, tmp4;
 
     switch(lexer->type) {
-        
+        // === stack ops ===
+        case DUP:
+            break;
+        case POP:
+            break;
+        case SWP:
+            break;
+        case OVR:
+            break;
+        case ROT:
+            break;
+        // === arithmetic ops ===
+        case PLS:
+            break;
+        case MIN:
+            break;
+        case MUL:
+            break;
+        case DIV:
+            break;
+        case MOD:
+            break;
+        // === boolean ops ===
+        case EQL:
+            break;
+        case NOT:
+            break;
+        case GRT:
+            break;
+        case LES:
+            break;
+        // === bitwise ops ===
+        case AND:
+            break;
+        case ORR:
+            break;
+        case INV:
+            break;
+        // === i/o ops ===
+        case DGT:
+            break;
+        case LTR:
+            break;
+        case STK:
+            break;
+        case RTN:
+            break;
+        // === make new op ===
+        case DEF:
+            break;
+        // === exit op ===
+        case BYE:
+            break;
+        // === literals ===
+        case STR:
+            break;
+        case NUM:
+            break;
         default:
             printf("wtf is %s?\n", lexer->tok);
             break;
