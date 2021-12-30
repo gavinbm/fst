@@ -98,7 +98,6 @@ int iskey(char *src) {
                           "ltr", "stk", "rtn", "def", "bye"};
     
     for(int i = 0; i < STR; i++) {
-        printf("[%s, %d] ", keys[i], i);
         if(strcmp(keys[i], src) == 0)
             return i;
     }
@@ -122,10 +121,10 @@ void next(lex **curr) {
     int len = 0, pos, key;
 
     switch(*peek) {
-        case EOF: break;
-        case '\0': peek++; break;
-        case '\n': break;
+        case EOF: (*curr)->type = -1; break;
+        case '\n': peek++; break;
         case ' ': peek++; break;
+        case '\0': (*curr)->type = -2; break;
         case '+': updatetok(curr, peek, PLS, 1); peek++; break;
         case '-': updatetok(curr, peek, MIN, 1); peek++; break;
         case '*': updatetok(curr, peek, MUL, 1); peek++; break;
@@ -201,14 +200,29 @@ void exec(lex *lexer) {
     switch(lexer->type) {
         // === stack ops ===
         case DUP:
+            push(stack[spr]);
             break;
         case POP:
+            pop();
             break;
         case SWP:
+            tmp1 = stack[spr];
+            pop();
+            tmp2 = stack[spr];
+            pop();
+            push(tmp1);
+            push(tmp2);
             break;
         case OVR:
+            tmp1 = stack[spr - 1];
+            push(tmp1);
             break;
         case ROT:
+            tmp1 = stack[spr];
+            tmp2 = stack[spr - 1];
+            tmp3 = stack[spr - 2];
+            pop(); pop(); pop();
+            push(tmp1); push(tmp2); push(tmp3);
             break;
         // === arithmetic ops ===
         case PLS:
@@ -239,23 +253,33 @@ void exec(lex *lexer) {
             break;
         // === i/o ops ===
         case DGT:
+            printf("%d", stack[spr]);
             break;
         case LTR:
+            printf("%c", stack[spr]);
             break;
         case STK:
+            for(int i = 0; i < spr; i++)
+                printf("%d ", stack[i]);
             break;
         case RTN:
+            printf("\n");
             break;
         // === make new op ===
         case DEF:
             break;
         // === exit op ===
         case BYE:
+            free(lexer->tok);
+            free(lexer);
+            exit(0);
             break;
         // === literals ===
         case STR:
+            printf("%s", lexer->tok);
             break;
         case NUM:
+            push(atoi(lexer->tok));
             break;
         default:
             printf("wtf is %s?\n", lexer->tok);
@@ -269,23 +293,15 @@ int main() {
     char buffer[MAXLEN];
 
     lex *lexer = malloc(sizeof(lex));
-    lexer->pos = buffer;
     lexer->tok = NULL;
 
-    while(1) {
-        printf(">> "); // print the prompt
-        
-        // Get a line of input, make sure it isn't null, tokenize and process it
-        if(fgets(buffer, MAXLEN, stdin) != NULL) {
-            buffer[strlen(buffer) - 1] = '\0';  // set the null terminator
-            
-            next(&lexer);
+    while(fgets(buffer, MAXLEN, stdin) != NULL) {
+        buffer[strlen(buffer) - 1] = '\0';
+        lexer->pos = buffer;
+        next(&lexer);
+        while(lexer->type != -2) {
             exec(lexer);
-            printf("[%s] -- [%d]\n", lexer->tok, lexer->type);
-
-        } else {
-            printf("Error getting input...\n");
-            break;
+            next(&lexer);
         }
     }
 
