@@ -1,7 +1,40 @@
-#include "ibp.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAXLEN 128
+#define STACKCAP 64
 
 /*
-110 105 118 97 71 LTR POP LTR POP LTR POP LTR POP LTR POP RTN
+=== instruction set ===
+ - Arithmetic operators for integers  (DONE)
+    - +     ( n m -- (n + m) )
+    - -     ( n m -- (n - m) )
+    - *     ( n m -- (n * m) )
+    - /     ( n m -- (n / m) )
+    - %     ( n m -- (n % m) )
+ - Boolean operators for comparisons   (DONE)
+    - =     checks equality of top two items on the stack
+    - !     checks for inequality
+    - >     checks for greater than
+    - <     checks for less than
+    - and   bitwise AND
+    - orr   bitwise OR
+    - inv   bitwise NOT
+ - Stack manipulation instructions     (DONE)
+    - dup   ( n -- n n )
+    - pop   ( n -- )
+    - swp   ( n m -- m n ) 
+    - ovr   ( n m -- n m n )
+    - rot   ( n m o -- o m n )
+ - Simple I/O instructions             (DONE)
+    - dgt   ( n -- )
+    - ltr   ( c -- )
+    - stk   ( -- )
+    - rtn   ( -- )
+ - New instruction creation             (WiP)
+    - def   creates a new instruction using the ones you have
+
+110 105 118 97 71 ltr pop ltr pop ltr pop ltr pop ltr pop rtn
 Prints my name with a newline at the end
 */
 
@@ -26,6 +59,26 @@ char *readfile(char *filename, int *len) {
 } 
 
 // ============================================
+// === the stack ===
+int stack[STACKCAP];
+int spr = 0;
+
+void push(int value) {
+    if(spr < STACKCAP) {
+        spr++;
+        stack[spr] = value;
+    } else
+        puts("Stack overflow...");
+}
+
+void pop() {
+    if(spr > 0)
+        spr--;
+    else
+        puts("Stack underflow...");
+}
+
+// ============================================
 // === Lexer ===
 
 enum {DUP, POP, SWP, OVR, ROT, PLS, MIN, MUL, DIV, MOD, 
@@ -39,12 +92,13 @@ struct lex {
 } typedef lex;
 
 int iskey(char *src) {
-    char keys[BYE][4] = { "dup", "pop", "swp", "ovr", "rot"
+    char keys[STR][4] = { "dup", "pop", "swp", "ovr", "rot",
                           "+", "-", "*", "/", "%%", "=", "!",
                           ">", "<", "and", "orr", "inv", "dgt",
                           "ltr", "stk", "rtn", "def", "bye"};
     
-    for(int i = 0; i < BYE; i++) {
+    for(int i = 0; i < STR; i++) {
+        printf("[%s, %d] ", keys[i], i);
         if(strcmp(keys[i], src) == 0)
             return i;
     }
@@ -53,7 +107,9 @@ int iskey(char *src) {
 }
 
 void updatetok(lex **lexer, char *tok, int type, int size) {
-    free((*lexer)->tok);
+    if((*lexer)->tok)
+        free((*lexer)->tok);
+    
     (*lexer)->tok = malloc(size + 1);
     memcpy((*lexer)->tok, tok, size);
     (*lexer)->tok[size] = '\0';
@@ -67,6 +123,8 @@ void next(lex **curr) {
 
     switch(*peek) {
         case EOF: break;
+        case '\0': peek++; break;
+        case '\n': break;
         case ' ': peek++; break;
         case '+': updatetok(curr, peek, PLS, 1); peek++; break;
         case '-': updatetok(curr, peek, MIN, 1); peek++; break;
@@ -136,231 +194,23 @@ void next(lex **curr) {
 // === repl ===
 
 // execute the current command
-void exec(struct Stack *stack, lex *lexer) {
+void exec(lex *lexer) {
 
     int tmp1, tmp2, tmp3, tmp4;
+
     switch(lexer->type) {
-        case NUM: // it's a number
-            tmp1 = atoi(lexer->tok);
-            if(tmp1) {
-                push(stack, tmp1);
-            } else {
-                printf("invalid number...\n");
-            }
-            break;
-        case STR: // it's a string
-            printf("%s", lexer->tok);
-            break;
-        /* --- Stack operations --- */
-        case DUP: // the DUP stack operation
-            if(stack->head != NULL) {
-                push(stack, stack->head->value);
-            } else {
-                printf("dup: needs at least 1 node on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case POP: // the POP stack operation
-            pop(stack);
-            break;
-        case SWP: // the SWP stack operation
-            if(stack->len >= 2) {
-                tmp1 = stack->head->value;
-                pop(stack);
-                tmp2 = stack->head->value;
-                pop(stack);
-                push(stack, tmp1);
-                push(stack, tmp2);
-            } else {
-                printf("swp: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case OVR: // the OVR stack operation
-            if(stack->len >= 2) {
-                tmp1 = stack->head->next->value;
-                push(stack, tmp1);
-            } else {
-                printf("ovr: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case ROT: //the ROT stack operation
-            if(stack->len >= 3) {
-                tmp1 = stack->head->value;
-                tmp2 = stack->head->next->value;
-                tmp3 = stack->head->next->next->value;
-                pop(stack);
-                pop(stack);
-                pop(stack);
-                push(stack, tmp1);
-                push(stack, tmp2);
-                push(stack, tmp3);
-            } else {
-                printf("ovr: needs at least 3 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        /* --- Math operations --- */
-        case PLS: // +
-            if(stack->len >= 2) {
-                stack->head->next->value = stack->head->next->value + stack->head->value;
-                pop(stack);
-            } else {
-                printf("+: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case MIN: // -
-            if(stack->len >= 2) {
-                stack->head->next->value = stack->head->next->value - stack->head->value;
-                pop(stack);
-            } else {
-                printf("-: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case MUL: // *
-            if(stack->len >= 2) {
-                stack->head->next->value = stack->head->next->value * stack->head->value;
-                pop(stack);
-            } else {
-                printf("*: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case DIV: // / (division)
-            if(stack->len >= 2) {
-                stack->head->next->value = stack->head->next->value / stack->head->value;
-                pop(stack);
-            } else {
-                printf("/: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        case MOD: // % (modulo)
-            if(stack->len >= 2) {
-                stack->head->next->value = stack->head->next->value % stack->head->value;
-                pop(stack);
-            } else {
-                printf("%%: needs at least 2 nodes on the stack, currently only %d...\n", stack->len);
-            }
-            break;
-        /* --- Boolean operations --- */
-        case EQL: // =
-            if(stack->len >= 2) {
-                if(stack->head->value == stack->head->next->value) {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 1);
-                } else {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 0);
-                }
-            } else {
-                push(stack, 1);
-            }
-            break;
-        case NOT: // !
-            if(stack->len >= 2) {
-                if(stack->head->value != stack->head->next->value) {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 1);
-                } else {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 0);
-                }
-            } else {
-                push(stack, 1);
-            }
-            break;
-        case GRT: // >
-            if(stack->len >= 2) {
-                if(stack->head->value > stack->head->next->value) {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 1);
-                } else {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 0);
-                }
-            } else {
-                push(stack, 1);
-            }
-            break;
-        case LES: // <
-            if(stack->len >= 2) {
-                if(stack->head->value < stack->head->next->value) {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 1);
-                } else {
-                    pop(stack);
-                    pop(stack);
-                    push(stack, 0);
-                }
-            } else {
-                push(stack, 1);
-            }
-            break;
-        /* --- Bitwise operations --- */
-        case AND: // AND
-            if(stack->len >= 2) {
-                tmp1 = stack->head->value & stack->head->next->value;
-                pop(stack);
-                push(stack, tmp1);
-            } else {
-                push(stack, 1);
-            }
-            break;
-        case ORR: // ORR
-            if(stack->len >= 2) {
-                tmp1 = stack->head->value | stack->head->next->value;
-                pop(stack);
-                push(stack, tmp1);
-            } else {
-                push(stack, 1);
-            }
-            break;
-        case INV: // INV
-            if(stack->len >= 2) {
-                tmp1 = ~stack->head->value;
-                pop(stack);
-                push(stack, tmp1);
-            } else {
-                push(stack, 1);
-            }
-            break;
-        /* --- I/O operations --- */
-        case DGT: // DGT
-            printf("%d", stack->head->value);
-            break;
-        case LTR: // LTR
-            printf("%c", stack->head->value);
-            break;
-        case STK: // STK
-            print_stack(stack);
-            break;
-        case RTN: // RTN
-            printf("\n");
-            break;
-        /* --- New op creator --- */
-        case DEF: // def
-            // TODO...
-            break;
-        /* --- Exit the program --- */
-        case 28: // BYE
-            printf("Exiting program... Goodbye...\n");
-            free_stack(stack);
-            exit(0);
-            break;
-        /* --- dict entry or error --- */
+        
         default:
             printf("wtf is %s?\n", lexer->tok);
             break;
     }
 }
 
+// ===================================================
+// === driver code ===
 int main() {
     char buffer[MAXLEN];
 
-    struct Stack *stack = init_stack(STACKCAP);
     lex *lexer = malloc(sizeof(lex));
     lexer->pos = buffer;
     lexer->tok = NULL;
@@ -373,7 +223,8 @@ int main() {
             buffer[strlen(buffer) - 1] = '\0';  // set the null terminator
             
             next(&lexer);
-            exec(stack, lexer);
+            exec(lexer);
+            printf("[%s] -- [%d]\n", lexer->tok, lexer->type);
 
         } else {
             printf("Error getting input...\n");
@@ -381,6 +232,5 @@ int main() {
         }
     }
 
-    free_stack(stack);
     return 0;
 }
