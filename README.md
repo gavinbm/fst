@@ -55,8 +55,151 @@ The built-in instructions include:
     - :   creates a new instruction using the ones you have
 ```
 
+# The Virtual Machine (it's just a stack)
+We can only put integers on our stack so we can implement the stack as an integer array like so
+```C
+int stack[STACKCAP]; // the stack itself
+int spr = -1;        // the stack pointer, index of the top of the stack
+```
+STACKCAP is a defined constant (it's 64) so we have that many stack spots which we can fill and manipulate to our hearts content. Obviously a stack can manipulated only via pushes and pops, anything else is just a bunch of pushes and pops wearing a big trench coat pretending to be a unique instruction. The push and pop we functions we use can be seen here
+```C
+void push(int value) {
+    if(spr < STACKCAP) {
+        spr++;
+        stack[spr] = value;
+    } else
+        puts("Stack overflow...");
+}
+
+void pop() {
+    if(spr > 0)
+        spr--;
+    else
+        puts("Stack underflow...");
+}
+
+```
+Simple stuff right? All we really have to do is check that we're within the bounds of our stack and then increment the stack pointer as needed, filling in values when we push. You might notice we don't delete anything when we pop, that's fine, decrementing the stack pointer ensure we simply can't access it and that it will be overwritten once we push again.
+
+# The Interpreter - The Lexer
+Reading stack-based languages are really simple if you're using reverse polish notation, especially when we have such a sparse set of features and language constructs. We'll examine the interpreter I've written by chunking it into sections, let's start with the lexer, which is really just one struct and two functions. The meat and potatoes of our lexer is the next function (I'll give the code later) which grabs the next token and all the information needed to figure out what exactly it is and if it's valid.
+
+The lexer is represented as a single struct like so
+```C
+struct lex {
+    int type;  // the type of the current token
+    char *tok; // the text of the current token
+    char *pos; // the position in the string we're lexing
+} typedef lex;
+```
+
+This a pretty standard, barebones style lexer that doesn't use any fun bells and whistles. We allocate only one of these and just keep updating the values stored in that single lexer. We update these values with the following function
+
+```C
+// lexer - the lexer we're editing
+// tok   - the new token text we're looking at
+// type  - the lexeme type associated with the token
+// size  - the length of the token text
+void updatetok(lex **lexer, char *tok, int type, int size) {
+    // free the old token text if it's there
+    if((*lexer)->tok)
+        free((*lexer)->tok);
+    
+    (*lexer)->tok = malloc(size + 1); // allocate the space for the text
+    memcpy((*lexer)->tok, tok, size); // copy in the text
+    (*lexer)->tok[size] = '\0';       // set the null terminator
+    (*lexer)->type = type;            // set the new type
+}
+```
+
+I love double pointers, they're magical things really once ya get a hang for em. This function is called everytime we check a token, we can see how it's called in the next function the code for which is here
+
+```C
+void next(lex **curr) {
+
+    char *peek = (*curr)->pos, *sub;
+    int len = 0, pos, key;
+
+    switch(*peek) {
+        case EOF: (*curr)->type = -1; break;
+        case '\n': peek++; break;
+        case ' ': peek++; break;
+        case '\0': (*curr)->type = -2; break;
+        case '+': updatetok(curr, peek, PLS, 1); peek++; break;
+        case '-': updatetok(curr, peek, MIN, 1); peek++; break;
+        case '*': updatetok(curr, peek, MUL, 1); peek++; break;
+        case '/': updatetok(curr, peek, DIV, 1); peek++; break;
+        case '%': updatetok(curr, peek, MOD, 1); peek++; break;
+        case '=': updatetok(curr, peek, EQL, 1); peek++; break;
+        case '!': updatetok(curr, peek, NOT, 1); peek++; break;
+        case '>': updatetok(curr, peek, GRT, 1); peek++; break;
+        case '<': updatetok(curr, peek, LES, 1); peek++; break;
+        case '\"':
+            peek++;
+            while(peek[len] != '\"') {
+                if(peek[len] == '\n' || peek[len] == '\t' || peek[len] == '\r' || peek[len] == '\\' || peek[len] == '%') {
+                    printf("illegal char in string...\n");
+                    exit(10);
+                }
+                len++;
+            }
+
+            sub = malloc(len + 1);
+            memcpy(sub, peek, len);
+            sub[len] = '\0';
+            updatetok(curr, peek, STR, len);
+            free(sub);
+
+            peek = peek + len + 1;
+            break;
+        default:
+            if(*peek >= 'a' && *peek <= 'z') {
+                while(peek[len] >= 'a' && peek[len] <= 'z')
+                    len++;
+                
+                sub = malloc(len + 1);
+                memcpy(sub, peek, len);
+                sub[len] = '\0';
+                key = iskey(sub);
+                if(key == -1) {
+                    printf("invalid token [%s]...\n", sub);
+                    exit(2);
+                } else {
+                    updatetok(curr, peek, key, len);
+                }
+                free(sub);
+            }
+            else if(*peek >= '0' && *peek <= '9') {
+                while(peek[len] >= '0' && peek[len] <= '9')
+                    len++;
+                
+                if(peek[len] == '.') {
+                    puts("No floats..."); exit(4);
+                }
+
+                updatetok(curr, peek, NUM, len);
+            } else {
+                printf("invalid char [%c]\n", *peek);
+                exit(1);
+            }
+
+            peek = peek + len + 1;
+            break;
+    }
+
+    (*curr)->pos = peek;
+}
+```
+You can see that we're once again abusing double pointers, passing in the address to the lexer so we can update it without allocating new pointers. I think reducing the number of mallocs greatly improves the efficiency of your code since malloc works via some massive linked list that exists behind your code and reducing your interactions with that likely improves both the asymptotic time and the real time taken by your code.
+
+# The Interpreter - Parsing
+We don't really parse honestly, no need to with a language like this that has no strict grammar. It's just space separated instructions, easy stuff. The tokens we get are either things that go on the stack or instructions that do stuff to the stack (unless it's a string literal which just gets printed to stdout).
+
+# The Interpreter - Instruction Execution
+This is pretty fun, I'm not going to include the code because it's a 100+ line switch statement but the entire process I'm going to outline is in the exec function. This function decides what to do based on the current lexeme type. If we get a number, we put it on the stack, if we get a word/character, we check if it's an instruction. If it's an instruction, we execute it, otherwise we throw an error (which I think is rather comically written). Really simple stuff but it was fun to write the C implementation for all of these instructions.
+
 # What is a FORTH and what is Sopl?
-FORTH is a lot of things but to sum it up, it's a stack-based virtual machine that typically runs on a system without an OS and performs all interpretation, compilation, and assembly of it's language on it's own. This isn't what I'm doing here as I'd have to write a USB stack and familiarize myself with processor interrupts to do that properly and I don't have the time to commit to that these days.
+FORTH is a lot of things but to sum it up, it's a stack-based virtual machine that typically runs on a system without an OS and performs all interpretation, compilation, and assembly of the language on its own. This isn't what I'm doing here as I'd have to write a USB stack and familiarize myself with processor interrupts to do that properly and I don't have the time to commit to that these days.
 
 Sopl is like a higher-level FORTH that runs inside an OS. It's purely an exercise in C programming, interpreter design, and (most importantly) fun for me.
 
