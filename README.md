@@ -14,11 +14,11 @@ This is the very early stages of development and right now only really allows yo
  - [ ] Allow for expansion of the dictionary
 
 # Current Features and Instructions
-In accordance with it's stack-based nature, sopl uses reverse polish notation to perform arithmetic and has a collection of instructions, all of which use the stack to get their arguments and many of which offer exciting ways to manipulate the values on the stack. an example of reverse polish notation is 
+In accordance with it's stack-based nature, sopl uses reverse polish notation to perform arithmetic and has a collection of instructions, all of which use the stack to get their arguments and many of which offer exciting ways to manipulate the values on the stack. So a reverse polish notation expression like
 ```
 2 3 +
 ```
-Which is equivalent to
+written in the standard infix notation would be
 ```
 2 + 3
 ```
